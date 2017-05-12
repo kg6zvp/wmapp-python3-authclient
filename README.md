@@ -10,3 +10,5 @@ Requirements:
 * socket
 
 socket and json are probably already installed, but the remaining can be installed with pip.
+
+**NOTE: Currently does not include token renewal**
