@@ -86,7 +86,7 @@ def checkCode(httpResponse, expectedResponse, failureMessage):
 	if httpResponse.status_code != expectedResponse:
 		print("\tFailed to "+failureMessage)
 		print("\t"+str(httpResponse.status_code))
-		print("\t"+httpResponse.content)
+		print("\t"+str(httpResponse.content, 'utf-8'))
 		return False
 	return True
 
@@ -104,7 +104,7 @@ def persistTokens():
 	with open('sigb64.txt', 'w') as sf:
 		sf.write(getSignature())
 
-def wmLogin(username, password, deviceName):
+def wmLogin(username, password, deviceName=socket.gethostname()):
 	validCreds = getToken(username, password, deviceName)
 	if not checkCode(validCreds, 200, "login"):
 		return False
@@ -118,7 +118,7 @@ def wmLogin(username, password, deviceName):
 def promptLogin():
 	username = input("Username: ")
 	passwd = getpass.getpass()
-	return wmLogin(username, passwd, socket.gethostname())
+	return wmLogin(username, passwd)
 
 def loadCredentials(prompt=True):
 	if readTokens():
