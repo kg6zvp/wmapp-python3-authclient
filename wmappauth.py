@@ -24,6 +24,9 @@ tokenValidUrl = tokenBaseUrl+"/tokenValid"
 tokenSignature=""
 tokenString=""
 
+TOKEN_HEADER='Token'
+TOKEN_SIGNATURE_HEADER='TokenSignature'
+
 def readTokens():
 	try:
 		with open('token.json', 'r') as tf:
@@ -54,10 +57,20 @@ def listTokens(token, sigb64):
 	return requests.get(url=listUrl, headers=hrs)
 
 def renewToken(token, sigb64):
+	global TOKEN_HEADER
+	global TOKEN_SIGNATURE_HEADER
 	hrs = {'Content-Type': 'application/json'}
-	hrs['Token'] = token
-	hrs['TokenSignature'] = sigb64
-	return requests.get(url=renewUrl, headers=hrs)
+	hrs[TOKEN_HEADER] = token
+	hrs[TOKEN_SIGNATURE_HEADER] = sigb64
+	newCreds = requests.get(url=renewUrl, headers=hrs)
+	if not checkCode(newCreds, 200, "renew"):
+		return False
+	global tokenString
+	tokenString = str(newCreds.content, 'utf-8')
+	global tokenSignature
+	tokenSignature = newCreds.headers[TOKEN_SIGNATURE_HEADER]
+	persistTokens()
+	return True
 
 def subscribeToInvalidation(invalidationSubscription, token, sigb64):
 	hrs = {'Content-Type': 'application/json'}
@@ -130,7 +143,7 @@ def loadCredentials(prompt=True):
 
 """
 /*
- * If this is being executed as a program
+ * If this is being executed as a program, run sample code
  */
 """
 if __name__ == "__main__":
