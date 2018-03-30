@@ -1,0 +1,26 @@
+image: 'python:3-stretch'
+
+before_script:
+  - apt-get update && apt-get install -y git
+  - pip install requests
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Run dep script here"
+    - git clone --recursive "$CI_REPOSITORY_URL" wmapp-python3-authclient
+    - cd wmapp-python3-authclient
+    - git config user.email "kg6zvp@gmail.com"
+    - git config --global user.name "Sam McCollum"
+    - git remote add github "https://kg6zvp:$GITHUB_PERSONAL_ACCESS_TOKEN@github.com/kg6zvp/wmapp-python3-authclient.git"
+    - git push --force --follow-tags github master
+    - cd ..
+    - rm -rf wmapp-python3-authclient
+  only:
+    - master
+
+after_script:
+  - echo "End CI"
